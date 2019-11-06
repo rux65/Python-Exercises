@@ -170,19 +170,19 @@ for($i=1; $i<sizeof($arr); $i++){
 	}
 }
 
+echo "<br>";
 echo "<p>ID's and module marks to be included...</p>";
 
 // analysis
-echo "<br><br>";
-$sum =0;
-$count_grades=0;
+echo "<br>";
+global $sum, $count_grades;
 $min_grade = min($id_grades);
 $max_grades = max ($id_grades);
+$value;
 
 foreach ($id_grades as $key => $value){
-		$sum +=$value;
+		$sum += $value; // value is the problem
 		$count_grades++;
-		
 		echo "<p> $key : $value</p>";
 	}
 echo "<p>Statistical Analysis of module marks...</p>";
