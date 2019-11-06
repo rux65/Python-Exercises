@@ -26,3 +26,175 @@
 
 </body>
 </html>
+
+
+
+
+
+//PHP ASSIGNMENT
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<style>
+		p{
+			line_height:0.8 rem;
+			font-size:12px;
+			font-family:Arial;
+		}
+	</style>
+</head>
+<body>
+
+<p>P1 TMA data files.zip : INVALID FILE EXTENSION- should be .txt</p> 
+<!-- have to see how to give errors -->
+
+<?php
+
+$modules = array("PP", "P1", "DT");
+$term_codes = array ("T1", "T2", "T3");
+
+$dir = ("./");
+$handle = opendir($dir);
+$dir = iconv("utf-8","windows-1256",$dir); // converts to latin alphabet
+$file_names = array();
+ while($file= readdir($handle)){
+	 if($file != "." && $file != ".."){
+		//echo $dir."/".$file."<br>";
+		$file_names[]=$file;
+	}
+ }
+ 
+//print_r($file_names);
+
+//reading files
+$toread2 = fopen('p1IH.txt','r');
+$arr = array();
+
+while (!feof($toread2)) { // while it has not reachied end of file
+	$arr[] = fgets($toread2, 1024);
+}
+fclose($toread2);
+// reading files
+
+// header//
+echo "<p> Module Header Data...</p>";
+$line = explode(',', $arr[0]);
+$header = array();
+$whitespace_error = ":ERROR:data not entered";
+$header_error_count=0;
+
+if( sizeof($line) == 4){
+	for ($i=0; $i<4; $i++){
+		if (ctype_space($line[$i])) { // error is not added
+			$line[$i].= ":ERROR";
+			$header_error_count++;
+		}
+	}
+	
+	// module code
+	$module = substr($line[0],0,2,);
+	$year = substr($line[0],2, 4);
+	$term_code = substr($line[0],6, 2);
+	
+	if (!in_array($module, $modules)){
+		$line[0].=" :ERROR";
+		$header_error_count++;
+	} else if(!is_int($year)){
+		$line[0].=" :ERROR";
+		$header_error_count++;
+	}else if (!in_array($term_code, $term_codes)){
+		$line[0].=" :ERROR";
+		$header_error_count++;
+	}
+	
+	$header["Module Code: "] = trim($line[0]);
+	
+	$header["Module Title : "]= $line[1];
+	$header["Tutor : "]= $line[2];
+	$header["Marked Date : "]= $line[3];
+	
+	foreach ($header as $key => $value){ 
+		echo "<p> $key $value</p>";
+	}
+}
+
+//grades//
+echo "<br><br>";
+echo "<p>Student ID and Mark data read from file...</p>";
+
+
+$id_grades = array();
+$student_no=0;
+$student_error_count=0;
+
+for($i=1; $i<sizeof($arr); $i++){
+	$id_grade_line = explode(", ",$arr[$i]);
+	$grade = trim($id_grade_line[1]);
+	if(!is_int($grade) && ($grade>100 || $grade<0)){
+		if(!is_int($id_grade_line[0]) && strlen((string)$id_grade_line[0])!=8){
+			echo "<p>$id_grade_line[0] : trim($id_grade_line[1]) - Incorrect student ID: not included -Incorrect mark: not included </p>";
+			$student_error_count++;
+		}else{
+			echo "<p>$id_grade_line[0] : $id_grade_line[1] -Incorrect mark: not included </p>";
+			$student_error_count++;
+		}
+	}else{
+		if(!is_int($id_grade_line[0]) && strlen((string)$id_grade_line[0])!=8){
+			echo "<p>$id_grade_line[0] : $id_grade_line[1] - Incorrect student ID: not included</p>";
+			$student_error_count++;
+		} else{
+			echo "<p>$id_grade_line[0] : $id_grade_line[1]</p>";
+			$id_grades[$id_grade_line[0]]= trim($grade);
+			$student_no++;
+			$func = 'switching';
+			$func($grade);
+			//switching($grade);
+			
+		}
+	}
+}
+
+echo "<p>ID's and module marks to be included...</p>";
+function switching($grade){ // fix here - 
+	global $dist, $merit, $pass, $fail;
+	if( $grade>70){
+		$dist++;
+	}else if($grade >60){
+		$merit++;
+	}else if($grade>40){
+		$pass++;
+	}else{
+		$fail++;
+}}
+
+// analysis
+echo "<br><br>";
+$sum =0;
+$count_grades=0;
+$min_grade = min($id_grades);
+$max_grades = max ($id_grades);
+
+foreach ($id_grades as $key => $value){
+		
+		$sum +=$value;
+		$count_grades++;
+		
+		echo "<p> $key : $value</p>";
+	}
+echo "<p>Statistical Analysis of module marks...</p>";
+echo "<h># of students:$student_no <br> # of Header Errors:$header_error_count <br># of Student data Errors:$student_error_count<br></p>";
+echo "<p>Grade Distribution of module marks...</p>";
+
+echo "<p>Dist: $dist </p>";
+echo "<p>Merit: $merit </p>";
+echo "<p>Pass: $pass </p>";
+echo "<p>Fail: $fail </p>";
+
+?>
+
+</body>
+</html>
+
+
