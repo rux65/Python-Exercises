@@ -1,4 +1,12 @@
 # Default ignored files
 /workspace.xml
 
+.gitignore
+codeStyles
+Consolidate-Python-Exercises.iml
+misc.xml
+modules.xml
+vcs.xml
+workspace.xml
+$PRODUCT_WORKSPACE_FILE$
 .idea
